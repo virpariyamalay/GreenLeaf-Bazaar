@@ -1,0 +1,233 @@
+import { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../contexts/CartContext';
+import { FiShoppingCart, FiUser, FiMenu, FiX } from 'react-icons/fi';
+import Logo from '../ui/Logo';
+import ThemeToggle from '../ui/ThemeToggle';
+
+const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const { isAuthenticated, currentUser, logout, isAdmin, isSeller } = useAuth();
+  const { cartCount } = useCart();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    setIsMenuOpen(false);
+    setIsProfileMenuOpen(false);
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  return (
+    <nav className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50">
+      <div className="container-custom py-3">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex-shrink-0">
+            <Logo />
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <NavLink to="/" className={({isActive}) => 
+              isActive ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors'
+            }>
+              Home
+            </NavLink>
+            <NavLink to="/marketplace" className={({isActive}) => 
+              isActive ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors'
+            }>
+              Marketplace
+            </NavLink>
+            
+            {isSeller && (
+              <NavLink to="/seller/dashboard" className={({isActive}) => 
+                isActive ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors'
+              }>
+                Seller Dashboard
+              </NavLink>
+            )}
+            
+            {isAdmin && (
+              <NavLink to="/admin/dashboard" className={({isActive}) => 
+                isActive ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors'
+              }>
+                Admin Dashboard
+              </NavLink>
+            )}
+          </div>
+
+          {/* Right side actions */}
+          <div className="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
+            {isAuthenticated ? (
+              <>
+                <Link to="/cart" className="relative">
+                  <FiShoppingCart className="text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 text-xl" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+                <div className="relative">
+                  <button 
+                    className="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400"
+                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  >
+                    <FiUser className="mr-1" />
+                    <span className="font-medium">
+                      {currentUser.name || currentUser.username}
+                    </span>
+                  </button>
+                  {isProfileMenuOpen && (
+                    <div 
+                      className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-10"
+                      onMouseLeave={() => setIsProfileMenuOpen(false)}
+                    >
+                      <Link 
+                        to="/profile" 
+                        className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
+                        My Profile
+                      </Link>
+                      {isSeller && (
+                        <Link 
+                          to="/seller/add-product" 
+                          className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          onClick={() => setIsProfileMenuOpen(false)}
+                        >
+                          Add Product
+                        </Link>
+                      )}
+                      <button 
+                        onClick={handleLogout} 
+                        className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex space-x-2">
+                <Link to="/login" className="btn-outline dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                  Login
+                </Link>
+                <Link to="/register" className="btn-primary">
+                  Register
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center space-x-4">
+            <ThemeToggle />
+            {isAuthenticated && (
+              <Link to="/cart" className="relative">
+                <FiShoppingCart className="text-gray-700 dark:text-gray-300 text-xl" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
+            <button
+              onClick={toggleMenu}
+              className="text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 focus:outline-none"
+            >
+              {isMenuOpen ? (
+                <FiX className="h-6 w-6" />
+              ) : (
+                <FiMenu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white dark:bg-gray-900 py-2 px-4 shadow-inner animate-fade-in">
+          <div className="flex flex-col space-y-3">
+            <NavLink to="/" className={({isActive}) => 
+              isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
+            } onClick={closeMenu}>
+              Home
+            </NavLink>
+            <NavLink to="/marketplace" className={({isActive}) => 
+              isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
+            } onClick={closeMenu}>
+              Marketplace
+            </NavLink>
+            
+            {isSeller && (
+              <NavLink to="/seller/dashboard" className={({isActive}) => 
+                isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
+              } onClick={closeMenu}>
+                Seller Dashboard
+              </NavLink>
+            )}
+            
+            {isAdmin && (
+              <NavLink to="/admin/dashboard" className={({isActive}) => 
+                isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
+              } onClick={closeMenu}>
+                Admin Dashboard
+              </NavLink>
+            )}
+            
+            {isSeller && (
+              <NavLink to="/seller/add-product" className={({isActive}) => 
+                isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
+              } onClick={closeMenu}>
+                Add Product
+              </NavLink>
+            )}
+            
+            {isAuthenticated ? (
+              <>
+                <NavLink to="/profile" className={({isActive}) => 
+                  isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
+                } onClick={closeMenu}>
+                  My Profile
+                </NavLink>
+                <button 
+                  onClick={handleLogout}
+                  className="text-left text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <div className="flex flex-col space-y-2 pt-2 pb-3">
+                <Link to="/login" className="btn-outline dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 w-full text-center" onClick={closeMenu}>
+                  Login
+                </Link>
+                <Link to="/register" className="btn-primary w-full text-center" onClick={closeMenu}>
+                  Register
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default Navbar;

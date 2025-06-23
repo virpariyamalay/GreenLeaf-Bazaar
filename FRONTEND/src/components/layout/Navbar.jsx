@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
-import { FiShoppingCart, FiUser, FiMenu, FiX } from 'react-icons/fi';
+import { FiShoppingCart, FiUser, FiMenu, FiX, FiLogOut } from 'react-icons/fi';
 import Logo from '../ui/Logo';
 import ThemeToggle from '../ui/ThemeToggle';
 
@@ -39,27 +39,37 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <NavLink to="/" className={({isActive}) => 
+            <NavLink to="/" className={({ isActive }) =>
               isActive ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors'
             }>
               Home
             </NavLink>
-            <NavLink to="/marketplace" className={({isActive}) => 
+            <NavLink to="/marketplace" className={({ isActive }) =>
               isActive ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors'
             }>
               Marketplace
             </NavLink>
-            
+            <NavLink to="/about" className={({ isActive }) =>
+              isActive ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors'
+            }>
+              About
+            </NavLink>
+            <NavLink to="/contact" className={({ isActive }) =>
+              isActive ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors'
+            }>
+              Contact
+            </NavLink>
+
             {isSeller && (
-              <NavLink to="/seller/dashboard" className={({isActive}) => 
+              <NavLink to="/seller/dashboard" className={({ isActive }) =>
                 isActive ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors'
               }>
                 Seller Dashboard
               </NavLink>
             )}
-            
+
             {isAdmin && (
-              <NavLink to="/admin/dashboard" className={({isActive}) => 
+              <NavLink to="/admin/dashboard" className={({ isActive }) =>
                 isActive ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors'
               }>
                 Admin Dashboard
@@ -68,11 +78,11 @@ const Navbar = () => {
           </div>
 
           {/* Right side actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-6">
             <ThemeToggle />
             {isAuthenticated ? (
-              <>
-                <Link to="/cart" className="relative">
+              <div className="flex items-center space-x-6">
+                <Link to="/cart\" className="relative">
                   <FiShoppingCart className="text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 text-xl" />
                   {cartCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
@@ -81,46 +91,54 @@ const Navbar = () => {
                   )}
                 </Link>
                 <div className="relative">
-                  <button 
+                  <button
                     className="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400"
                     onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   >
-                    <FiUser className="mr-1" />
-                    <span className="font-medium">
-                      {currentUser.name || currentUser.username}
-                    </span>
+                    <FiUser className="text-xl" />
                   </button>
                   {isProfileMenuOpen && (
-                    <div 
-                      className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-10"
+                    <div
+                      className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-10"
                       onMouseLeave={() => setIsProfileMenuOpen(false)}
                     >
-                      <Link 
-                        to="/profile" 
-                        className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {currentUser.name || currentUser.username}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {currentUser.email}
+                        </p>
+                        <p className="text-xs text-primary-600 dark:text-primary-400 mt-1">
+                          {currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)}
+                        </p>
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         onClick={() => setIsProfileMenuOpen(false)}
                       >
-                        My Profile
+                        View Profile
                       </Link>
                       {isSeller && (
-                        <Link 
-                          to="/seller/add-product" 
-                          className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        <Link
+                          to="/seller/add-product"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                           onClick={() => setIsProfileMenuOpen(false)}
                         >
                           Add Product
                         </Link>
                       )}
-                      <button 
-                        onClick={handleLogout} 
-                        className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      >
-                        Logout
-                      </button>
                     </div>
                   )}
                 </div>
-              </>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400"
+                >
+                  <FiLogOut className="text-xl" />
+                </button>
+              </div>
             ) : (
               <div className="flex space-x-2">
                 <Link to="/login" className="btn-outline dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
@@ -137,14 +155,22 @@ const Navbar = () => {
           <div className="md:hidden flex items-center space-x-4">
             <ThemeToggle />
             {isAuthenticated && (
-              <Link to="/cart" className="relative">
-                <FiShoppingCart className="text-gray-700 dark:text-gray-300 text-xl" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
+              <>
+                <Link to="/cart\" className="relative">
+                  <FiShoppingCart className="text-gray-700 dark:text-gray-300 text-xl" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400"
+                >
+                  <FiLogOut className="text-xl" />
+                </button>
+              </>
             )}
             <button
               onClick={toggleMenu}
@@ -164,55 +190,72 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-white dark:bg-gray-900 py-2 px-4 shadow-inner animate-fade-in">
           <div className="flex flex-col space-y-3">
-            <NavLink to="/" className={({isActive}) => 
+            {isAuthenticated && (
+              <div className="py-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center space-x-3">
+                  <FiUser className="text-gray-500 dark:text-gray-400" />
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {currentUser.name || currentUser.username}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {currentUser.email}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            <NavLink to="/" className={({ isActive }) =>
               isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
             } onClick={closeMenu}>
               Home
             </NavLink>
-            <NavLink to="/marketplace" className={({isActive}) => 
+            <NavLink to="/marketplace" className={({ isActive }) =>
               isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
             } onClick={closeMenu}>
               Marketplace
             </NavLink>
-            
+            <NavLink to="/about" className={({ isActive }) =>
+              isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
+            } onClick={closeMenu}>
+              About
+            </NavLink>
+            <NavLink to="/contact" className={({ isActive }) =>
+              isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
+            } onClick={closeMenu}>
+              Contact
+            </NavLink>
+
             {isSeller && (
-              <NavLink to="/seller/dashboard" className={({isActive}) => 
+              <NavLink to="/seller/dashboard" className={({ isActive }) =>
                 isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
               } onClick={closeMenu}>
                 Seller Dashboard
               </NavLink>
             )}
-            
+
             {isAdmin && (
-              <NavLink to="/admin/dashboard" className={({isActive}) => 
+              <NavLink to="/admin/dashboard" className={({ isActive }) =>
                 isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
               } onClick={closeMenu}>
                 Admin Dashboard
               </NavLink>
             )}
-            
+
             {isSeller && (
-              <NavLink to="/seller/add-product" className={({isActive}) => 
+              <NavLink to="/seller/add-product" className={({ isActive }) =>
                 isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
               } onClick={closeMenu}>
                 Add Product
               </NavLink>
             )}
-            
+
             {isAuthenticated ? (
-              <>
-                <NavLink to="/profile" className={({isActive}) => 
-                  isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
-                } onClick={closeMenu}>
-                  My Profile
-                </NavLink>
-                <button 
-                  onClick={handleLogout}
-                  className="text-left text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2"
-                >
-                  Logout
-                </button>
-              </>
+              <NavLink to="/profile" className={({ isActive }) =>
+                isActive ? 'text-primary-700 dark:text-primary-400 font-semibold py-2' : 'text-gray-700 dark:text-gray-300 hover:text-primary-700 dark:hover:text-primary-400 py-2'
+              } onClick={closeMenu}>
+                My Profile
+              </NavLink>
             ) : (
               <div className="flex flex-col space-y-2 pt-2 pb-3">
                 <Link to="/login" className="btn-outline dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 w-full text-center" onClick={closeMenu}>
